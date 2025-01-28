@@ -27,7 +27,7 @@
                     formData.append('immagine', blob, file.name);
                     
                     // Usa il proxy CORS per bypassare la restrizione
-                    const response = await fetch("https://cors-anywhere.herokuapp.com/https://danielecelsa-cat-dog-final.hf.space/run/predict", {
+                    const response = await fetch("https://cors-anywhere.herokuapp.com/https://$danielecelsa-cat-dog-final.hf.space/run/predict", {
                         method: 'POST',
                         body: formData,
                         headers: {
