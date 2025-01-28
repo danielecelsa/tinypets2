@@ -1,81 +1,53 @@
----
-title: Dai Cristo!
-layout: page
----
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cat or Dog Predictor</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 2em;
-        }
-        #result {
-            margin-top: 1em;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-        #file-input {
-            margin-top: 1em;
-        }
-    </style>
+    <title>Cat or Dog?</title>
 </head>
 <body>
-    <h1>Cat or Dog Predictor</h1>
-    <p>Carica un'immagine e scopri se è un cane o un gatto!</p>
-
-    <input type="file" id="file-input" accept="image/*">
-    <div id="result">La predizione apparirà qui.</div>
+    <h1>Upload an Image to Classify (Cat or Dog)</h1>
+    
+    <input type="file" id="imageInput" accept="image/*">
+    <p id="message"></p>
+    <div id="result"></div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const fileInput = document.getElementById("file-input");
-            const resultDiv = document.getElementById("result");
+        document.getElementById('imageInput').addEventListener('change', async function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('message').textContent = "Caricamento in corso...";
 
-            async function handleImageUpload(event) {
-                const file = event.target.files[0];
-                if (!file) {
-                    resultDiv.textContent = "Per favore, carica un'immagine valida.";
-                    return;
-                }
+                // Converte l'immagine in un Blob
+                const blob = new Blob([file], { type: file.type });
 
-                resultDiv.textContent = "Caricamento in corso...";
-
+                // Ora inviamo la richiesta
                 try {
-                    // Prepara la richiesta
                     const formData = new FormData();
-                    formData.append("data", file);
-
-                    // Effettua la richiesta a HuggingFace Space
-                    const response = await fetch("https://huggingface.co/spaces/danielecelsa/cat-dog-final/predict", {
-                        method: "POST",
+                    formData.append('immagine', blob, file.name);
+                    
+                    // Usa il proxy CORS per bypassare la restrizione
+                    const response = await fetch("https://cors-anywhere.herokuapp.com/https://huggingface.co/spaces/danielecelsa/cat-dog-final/predict", {
+                        method: 'POST',
                         body: formData,
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'multipart/form-data'
+                        }
                     });
-
-                    if (!response.ok) {
-                        throw new Error(`Errore HTTP: ${response.status}`);
-                    }
-
+                    
                     const result = await response.json();
-
-                    // Mostra il risultato
-                    const prediction = result?.data?.[0]; // Estrarre la predizione
-                    if (prediction) {
-                        resultDiv.textContent = `Predizione: ${JSON.stringify(prediction)}`;
+                    if (result && result.data) {
+                        const prediction = result.data[0];  // Modifica in base alla risposta dell'API
+                        document.getElementById('result').textContent = `Predizione: ${prediction}`;
                     } else {
-                        resultDiv.textContent = "Errore durante la predizione. Riprova.";
+                        document.getElementById('result').textContent = "Errore durante la previsione.";
                     }
                 } catch (error) {
                     console.error("Errore durante la previsione:", error);
-                    resultDiv.textContent = "Errore durante la previsione. Riprova.";
+                    document.getElementById('result').textContent = "Errore durante la previsione. Riprova.";
                 }
             }
-
-            fileInput.addEventListener("change", handleImageUpload);
         });
     </script>
 </body>
