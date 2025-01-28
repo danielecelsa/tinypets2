@@ -51,7 +51,7 @@ layout: page
                     formData.append("data", file);
 
                     // Effettua la richiesta a HuggingFace Space
-                    const response = await fetch("https://huggingface.co/spaces/danielecelsa/cat-dog-final/api/predict", {
+                    const response = await fetch("https://huggingface.co/spaces/danielecelsa/cat-dog-final/predict", {
                         method: "POST",
                         body: formData,
                     });
